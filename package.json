@@ -7,6 +7,7 @@
   "author": "Aleksander Woźnica",
   "license": "MIT",
   "devDependencies": {
+    "@aws-appsync/utils": "^1.7.0",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/typescript": "^4.0.4",
     "@types/node": "^20.11.19",

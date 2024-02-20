@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@aws-appsync/utils':
+    specifier: ^1.7.0
+    version: 1.7.0
   '@graphql-codegen/cli':
     specifier: ^5.0.2
     version: 5.0.2(@types/node@20.11.19)(graphql@16.8.1)(typescript@5.3.3)
@@ -67,6 +70,10 @@ packages:
       node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
+    dev: true
+
+  /@aws-appsync/utils@1.7.0:
+    resolution: {integrity: sha512-f17HeFa1KVZSRYCMdt0hHABf2ZJUQokikaVjx5B8udjHh7B3N0YGKyr9VcyP7c4rofC+qCsUIlQc+T5aHvJ0mg==}
     dev: true
 
   /@babel/code-frame@7.23.5:
