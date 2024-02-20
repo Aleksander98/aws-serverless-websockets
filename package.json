@@ -2,7 +2,7 @@
   "name": "aws-serverless-websockets",
   "version": "1.0.0",
   "scripts": {
-    "build": "build-schema && build-resolvers && sam build",
+    "build": "sh ./build.sh && graphql-codegen && sam build",
     "build-resolvers": "sh ./build.sh",
     "build-schema": "graphql-codegen",
     "lint": "eslint 'src/**/*.ts' --quiet --fix"
