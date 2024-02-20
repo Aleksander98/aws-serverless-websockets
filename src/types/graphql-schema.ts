@@ -40,12 +40,18 @@ export type EventsResult = {
 export type Mutation = {
   __typename?: 'Mutation';
   addEvent: Event;
+  deleteEvent?: Maybe<Event>;
 };
 
 
 export type MutationAddEventArgs = {
   content: Scalars['String']['input'];
   userId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteEventArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type Query = {

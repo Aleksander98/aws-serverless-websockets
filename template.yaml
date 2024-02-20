@@ -104,6 +104,12 @@ Resources:
             Version: 1.0.0
           DataSource: None
           CodeUri: ./dist/onEvent.js
+        deleteEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: Events
+          CodeUri: ./dist/deleteEvent.js
       Resolvers:
         Query:
           getEvents:
@@ -119,6 +125,12 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - addEvent
+          deleteEvent:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - deleteEvent
         Subscription:
           onEvent:
             Runtime:

@@ -10,6 +10,7 @@ type Query {
 
 type Mutation {
   addEvent(userId: String!, content: String!): Event! @aws_api_key @aws_iam
+  deleteEvent(id: String!): Event
 }
 
 type Subscription {
