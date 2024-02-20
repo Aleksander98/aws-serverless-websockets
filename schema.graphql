@@ -1,0 +1,24 @@
+schema {
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Mutation {
+  addEvent(event: AddEventInput!): Event
+}
+
+type Subscription {
+  onEvent: Event @aws_subscribe(mutations: ["addEvent"])
+}
+
+type Event {
+  id: String!
+  userId: String!
+  content: String!
+  createdAt: AWSDateTime!
+}
+
+input AddEventInput {
+  userId: String!
+  content: String!
+}

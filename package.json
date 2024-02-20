@@ -2,11 +2,13 @@
   "name": "aws-serverless-websockets",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-schema": "graphql-codegen"
   },
   "author": "Aleksander Woźnica",
   "license": "MIT",
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript": "^4.0.4",
     "typescript": "^5.3.3"
   }
 }
