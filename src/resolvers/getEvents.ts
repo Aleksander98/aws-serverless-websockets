@@ -2,6 +2,7 @@ import {
   Context,
   DynamoDBQueryRequest,
   AppSyncIdentityCognito,
+  util,
 } from '@aws-appsync/utils';
 import { QueryGetEventsArgs, EventsResult } from '../types/graphql-schema';
 
