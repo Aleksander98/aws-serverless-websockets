@@ -39,6 +39,29 @@ Resources:
           Projection:
             ProjectionType: 'ALL'
 
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      SupportedIdentityProviders:
+        - COGNITO
+
   EventsGraphQLApi:
     Type: AWS::Serverless::GraphQLApi
     Properties:
@@ -46,8 +69,13 @@ Resources:
       Logging:
         FieldLogLevel: ERROR
       Auth:
-        Type: API_KEY
+        Type: AMAZON_COGNITO_USER_POOLS
+        UserPool:
+          UserPoolId: !Ref UserPool
+          AwsRegion: !Sub '${AWS::Region}'
+          DefaultAction: ALLOW
         Additional:
+          - Type: API_KEY
           - Type: AWS_IAM
       ApiKeys:
         DefaultApiKey:

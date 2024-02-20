@@ -9,14 +9,14 @@ type Query {
 }
 
 type Mutation {
-  addEvent(userId: String!, content: String!): Event!
+  addEvent(userId: String!, content: String!): Event! @aws_api_key @aws_iam
 }
 
 type Subscription {
   onEvent: Event @aws_subscribe(mutations: ["addEvent"])
 }
 
-type Event {
+type Event @aws_api_key @aws_iam {
   id: String!
   userId: String!
   content: String!
