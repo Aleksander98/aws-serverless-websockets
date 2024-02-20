@@ -98,6 +98,12 @@ Resources:
             Version: 1.0.0
           DataSource: Events
           CodeUri: ./dist/getEvents.js
+        onEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: None
+          CodeUri: ./dist/onEvent.js
       Resolvers:
         Query:
           getEvents:
@@ -113,6 +119,13 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - addEvent
+        Subscription:
+          onEvent:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - onEvent
 Outputs:
   EventsGraphQLApi:
     Description: EventsGraphQLApi endpoint URL for Prod environment
