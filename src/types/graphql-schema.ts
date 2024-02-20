@@ -23,11 +23,6 @@ export type Scalars = {
   AWSURL: { input: string; output: string; }
 };
 
-export type AddEventInput = {
-  content: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
-};
-
 export type Event = {
   __typename?: 'Event';
   content: Scalars['String']['output'];
@@ -36,14 +31,31 @@ export type Event = {
   userId: Scalars['String']['output'];
 };
 
+export type EventsResult = {
+  __typename?: 'EventsResult';
+  items: Array<Event>;
+  nextToken?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  addEvent?: Maybe<Event>;
+  addEvent: Event;
 };
 
 
 export type MutationAddEventArgs = {
-  event: AddEventInput;
+  content: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  getEvents: EventsResult;
+};
+
+
+export type QueryGetEventsArgs = {
+  pageToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Subscription = {

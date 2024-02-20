@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  aws-serverless-websockets
+
+  Serverless WebSockets in the AWS Cloud.
+
+Globals:
+  Function:
+    LoggingConfig:
+      LogFormat: JSON
+
+Resources:
+  EventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: 'userId'
+          AttributeType: 'S'
+        - AttributeName: 'id'
+          AttributeType: 'S'
+        - AttributeName: 'createdAt'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'userId'
+          KeyType: 'HASH'
+        - AttributeName: 'id'
+          KeyType: 'RANGE'
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      LocalSecondaryIndexes:
+        - IndexName: 'byCreatedAt'
+          KeySchema:
+            - AttributeName: 'userId'
+              KeyType: 'HASH'
+            - AttributeName: 'createdAt'
+              KeyType: 'RANGE'
+          Projection:
+            ProjectionType: 'ALL'
+
+  EventsGraphQLApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./schema.graphql
+      Logging:
+        FieldLogLevel: ERROR
+      Auth:
+        Type: API_KEY
+        Additional:
+          - Type: AWS_IAM
+      ApiKeys:
+        DefaultApiKey:
+          Description: Default api key
+      DataSources:
+        DynamoDb:
+          Events:
+            TableName: !Ref EventsTable
+            TableArn: !GetAtt EventsTable.Arn
+      Functions:
+        addEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: Events
+          CodeUri: ./dist/addEvent.js
+        getEvents:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: Events
+          CodeUri: ./dist/getEvents.js
+      Resolvers:
+        Query:
+          getEvents:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getEvents
+        Mutation:
+          addEvent:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - addEvent
+Outputs:
+  EventsGraphQLApi:
+    Description: EventsGraphQLApi endpoint URL for Prod environment
+    Value: !GetAtt EventsGraphQLApi.GraphQLUrl
+  EventsGraphQLApiDefaultApiKey:
+    Description: API Key for EventsGraphQLApi
+    Value: !GetAtt EventsGraphQLApiDefaultApiKey.ApiKey
