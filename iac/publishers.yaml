@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: aws-serverless-websockets
+
+Parameters:
+  AppSyncEndpoint:
+    Type: String
+  AppSyncApiKey:
+    Type: String
+
+Resources:
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: events
+
+  AppSyncApiDestinationConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: API_KEY
+      AuthParameters:
+        ApiKeyAuthParameters:
+          ApiKeyName: x-api-key
+          ApiKeyValue: !Ref AppSyncApiKey
+
+  AppSyncApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      ConnectionArn: !GetAtt AppSyncApiDestinationConnection.Arn
+      HttpMethod: POST
+      InvocationEndpoint: !Ref AppSyncEndpoint
+
+  EventBusDLQ:
+    Type: AWS::SQS::Queue
+
+  EventBusDLQPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref EventBusDLQ
+      PolicyDocument:
+        Statement:
+          - Action: "sqs:SendMessage"
+            Effect: Allow
+            Resource: !GetAtt EventBusDLQ.Arn
+            Principal:
+              Service: events.amazonaws.com
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt RouteToAppSyncRule.Arn
+
+  EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: EventBridgeInvokeAppSyncDestination
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: events:InvokeApiDestination
+                Resource:
+                  - !Sub "arn:aws:events:${AWS::Region}:${AWS::AccountId}:api-destination/${AppSyncApiDestination}/*"
+
+  RouteToAppSyncRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !GetAtt EventBus.Name
+      EventPattern:
+        source:
+          - events
+        detail-type:
+          - Event Added
+      Targets:
+        - Id: AppSyncEventAdded
+          Arn: !GetAtt AppSyncApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeRole.Arn
+          DeadLetterConfig:
+            Arn: !GetAtt EventBusDLQ.Arn
+          InputTransformer:
+            InputPathsMap:
+              content: "$.detail.content"
+              userId: "$.detail.userId"
+            InputTemplate: |
+              {
+                "query": "mutation AddEvent($content:String!, $userId:String!) { addEvent(content:$content, userId:$userId) { content createdAt id userId } }",
+                "operationName": "AddEvent",
+                "variables": {
+                  "content": "<content>",
+                  "userId": "<userId>"
+                }
+              }
+
+Outputs:
+  EventBusArn:
+    Value: !GetAtt EventBus.Arn
+    Description: The ARN of EventBus

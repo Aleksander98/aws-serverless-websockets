@@ -138,6 +138,15 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - onEvent
+
+  PublishersStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./iac/publishers.yaml
+      Parameters:
+        AppSyncEndpoint:  !GetAtt EventsGraphQLApi.GraphQLUrl
+        AppSyncApiKey: !GetAtt EventsGraphQLApiDefaultApiKey.ApiKey
+
 Outputs:
   EventsGraphQLApi:
     Description: EventsGraphQLApi endpoint URL for Prod environment
